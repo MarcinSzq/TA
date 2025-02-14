@@ -1,0 +1,62 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Sep  2 20:55:01 2024
+
+@author: marcin
+"""
+
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import json
+
+# Variables/paths
+web_browser = "chrome"
+url = "https://yousician.com/songs"
+accept_cookies_xpath = '//*[@id="onetrust-accept-btn-handler"]'
+input_field_xpath = '//*[@id="__next"]/div/div[2]/div[1]/div/div/div/form/div/input'
+json_element_xpath = '//script[@id="__NEXT_DATA__"]'
+
+# Initialize the WebDriver
+driver = webdriver.Chrome()
+
+try:
+    # Open the browser and navigate to the URL
+    driver.get(url)
+    driver.maximize_window()
+
+    # Wait until the accept cookies button is clickable and click it
+    WebDriverWait(driver, 3).until(EC.element_to_be_clickable((By.XPATH, accept_cookies_xpath))).click()
+
+    # Wait until the search input field is visible, input string, and submit
+    search_input = WebDriverWait(driver, 3).until(EC.visibility_of_element_located((By.XPATH, input_field_xpath)))
+    search_input.send_keys("AC DC")
+    search_input.send_keys(Keys.ENTER)
+
+    # Wait for the JSON data to be present in the DOM
+    json_data_element = WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.XPATH, json_element_xpath)))
+    json_data = json_data_element.get_attribute("innerHTML")
+
+    # Parse the JSON data
+    parsed_json = json.loads(json_data)
+
+    # Extract the list of exercises (songs)
+    exercises = parsed_json["props"]["pageProps"]["dehydratedState"]["queries"][0]["state"]["data"]["exercises"]
+
+    # Create a list of (artist, song) tuples and sort it
+    song_list = [(exercise["artist"], exercise["title"]) for exercise in exercises]
+    sorted_songs = sorted(song_list, key=lambda x: (x[0], x[1]))
+
+    # Print the sorted list of songs
+    for artist, title in sorted_songs:
+        print(f"{artist} - {title}")
+        
+     # Error handling 
+except Exception as e:
+    print(f"An error occurred: {e}")
+
+finally:
+    # Ensure the browser is closed properly
+   driver.quit()
