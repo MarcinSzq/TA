@@ -1,0 +1,319 @@
+{
+	"info": {
+		"_postman_id": "826eeea6-defb-4f0a-b5a0-d4a31fecc016",
+		"name": "NASA_CAD_API_Test",
+		"description": "This Postman collection is designed to interact with NASA's Close Approach Data (CAD) API. It retrieves information about near-Earth objects (NEOs) and their close approaches to Earth, Mars, and other celestial bodies. The collection includes 3 requests:\n\n1. **Asteroid 433 Eros check**: Retrieves data about close approaches of asteroid 433 Eros between the years 2000 and 2100, within a maximum distance of 0.2 astronomical units.\n    \n2. **Earth close approach NEOs 10LD**: Fetches details of NEOs that come within 10 lunar distances (LD) of Earth since January 1, 2018, with a limit of 1000 results.\n    \n3. **Mars close approach 1LD**: Provides information on objects approaching Mars within 1 lunar distance between January 1, 2020, and January 1, 2030.\n    \n\nEach request validates the API response for status code, content type, response time, and data structure integrity.\n\nThe collection includes also 2 variables: **base_url** and **endpoint**",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "43206636"
+	},
+	"item": [
+		{
+			"name": "Asteroid 433 Eros check",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test if the response status code is 200 (success)\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Test if the Content-Type header is JSON\r",
+							"pm.test(\"Content-Type is JSON\", function () {\r",
+							"    pm.response.to.have.header(\"Content-Type\", \"application/json\");\r",
+							"});\r",
+							"\r",
+							"// Test if the response time is less than 5500ms\r",
+							"pm.test(\"Response time is under 5500ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(5500);\r",
+							"});\r",
+							"\r",
+							"// Test if the response contains required properties\r",
+							"pm.test(\"Valid response structure\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property(\"signature\");\r",
+							"    pm.expect(jsonData).to.have.property(\"count\");\r",
+							"    pm.expect(jsonData).to.have.property(\"fields\");\r",
+							"    pm.expect(jsonData).to.have.property(\"data\");\r",
+							"});\r",
+							"\r",
+							"// Test if the count matches the length of the data array\r",
+							"pm.test(\"Data count matches array length\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.count).to.equal(jsonData.data.length);\r",
+							"});\r",
+							"\r",
+							"// Test if each row in the data array matches the number of fields\r",
+							"pm.test(\"Each data row matches field count\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    jsonData.data.forEach(row => {\r",
+							"        pm.expect(row.length).to.equal(jsonData.fields.length);\r",
+							"    });\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/{{endpoint}}?des=433&date-min=2000-01-01&date-max=2100-01-01&dist-max=0.2",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"{{endpoint}}"
+					],
+					"query": [
+						{
+							"key": "des",
+							"value": "433"
+						},
+						{
+							"key": "date-min",
+							"value": "2000-01-01"
+						},
+						{
+							"key": "date-max",
+							"value": "2100-01-01"
+						},
+						{
+							"key": "dist-max",
+							"value": "0.2"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Earth close approach NEOs 10LD",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test if the response status code is 200 (success)\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Test if the Content-Type header is JSON\r",
+							"pm.test(\"Content-Type is application/json\", function () {\r",
+							"    pm.response.to.have.header(\"Content-Type\", \"application/json\");\r",
+							"});\r",
+							"// Test if the response time is less than 5000ms\r",
+							"pm.test(\"Response time is under 5000ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(5000);\r",
+							"});\r",
+							"\r",
+							"// Test if the response contains required properties\r",
+							"pm.test(\"Valid response structure\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property(\"signature\");\r",
+							"    pm.expect(jsonData).to.have.property(\"count\");\r",
+							"    pm.expect(jsonData).to.have.property(\"fields\").that.is.an(\"array\");\r",
+							"    pm.expect(jsonData).to.have.property(\"data\").that.is.an(\"array\");\r",
+							"});\r",
+							"\r",
+							"// Test if the count matches the length of the data array\r",
+							"pm.test(\"Count matches data array length\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.count).to.equal(jsonData.data.length);\r",
+							"});\r",
+							"\r",
+							"// Test if each row in the data array matches the number of fields\r",
+							"pm.test(\"Data rows match field count\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    jsonData.data.forEach(row => {\r",
+							"        pm.expect(row.length).to.equal(jsonData.fields.length);\r",
+							"    });\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/{{endpoint}}?dist-max=10LD&date-min=2018-01-01&limit=1000",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"{{endpoint}}"
+					],
+					"query": [
+						{
+							"key": "dist-max",
+							"value": "10LD"
+						},
+						{
+							"key": "date-min",
+							"value": "2018-01-01"
+						},
+						{
+							"key": "limit",
+							"value": "1000"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Mars close approach 1LD",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test if the response status code is 200 (success)\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Test if the Content-Type header is JSON\r",
+							"pm.test(\"Content-Type is application/json\", function () {\r",
+							"    pm.response.to.have.header(\"Content-Type\", \"application/json\");\r",
+							"});\r",
+							"\r",
+							"// Test if the response time is less than 1000ms\r",
+							"pm.test(\"Response time is under 1000ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+							"});\r",
+							"\r",
+							"// Test if the response contains required properties\r",
+							"pm.test(\"Valid response structure\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property(\"signature\");\r",
+							"    pm.expect(jsonData).to.have.property(\"count\");\r",
+							"    pm.expect(jsonData).to.have.property(\"fields\").that.is.an(\"array\");\r",
+							"    pm.expect(jsonData).to.have.property(\"data\").that.is.an(\"array\");\r",
+							"});\r",
+							"\r",
+							"// Test if the count matches the length of the data array\r",
+							"pm.test(\"Count matches data array length\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.count).to.equal(jsonData.data.length);\r",
+							"});\r",
+							"\r",
+							"// Test if each row in the data array matches the number of fields\r",
+							"pm.test(\"Data rows match field count\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    jsonData.data.forEach(row => {\r",
+							"        pm.expect(row.length).to.equal(jsonData.fields.length);\r",
+							"    });\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/{{endpoint}}?body=Mars&dist-min=1LD&date-min=2020-01-01&date-max=2030-01-01",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"{{endpoint}}"
+					],
+					"query": [
+						{
+							"key": "body",
+							"value": "Mars"
+						},
+						{
+							"key": "dist-min",
+							"value": "1LD"
+						},
+						{
+							"key": "date-min",
+							"value": "2020-01-01"
+						},
+						{
+							"key": "date-max",
+							"value": "2030-01-01"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "https://ssd-api.jpl.nasa.gov",
+			"type": "string"
+		},
+		{
+			"key": "endpoint",
+			"value": "cad.api",
+			"type": "string"
+		}
+	]
+}
